@@ -1,0 +1,3 @@
+// Install tool dotnet ef globally
+dotnet tool install --global dotnet-ef 
+

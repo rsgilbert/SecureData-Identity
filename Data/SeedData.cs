@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 // dotnet aspnet-codegenerator razorpage -m Contact -dc ApplicationDbContext -udl -outDir Pages\Contacts --referenceScriptLibraries
 
@@ -11,14 +12,36 @@ namespace ContactManager.Data
 {
     public static class SeedData
     {
-        public static async Task Initialize(IServiceProvider serviceProvider, string testUserPw)
+        public static void Initialize(IServiceProvider serviceProvider, string testUserPw)
         {
             using (var context = new ApplicationDbContext(
                 serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {              
+                var UserManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                SeedIdentity(UserManager, context);
                 SeedDB(context, "0");
             }
         }        
+
+        public static void SeedIdentity(UserManager<IdentityUser> UserManager, ApplicationDbContext context)
+        {
+            Console.WriteLine("Seeding identity");
+            string email = "a@a.com";
+            string password = "stanislav";
+            var user = new IdentityUser { UserName = email, Email = email };
+            var result = UserManager.CreateAsync(user, password);
+            // If the new user is a duplicate we'll get a warning
+            // and the user wont be created
+            if(result.IsCompletedSuccessfully)
+            {
+                Console.WriteLine("Created user.");
+            }
+            else 
+            {
+                Console.WriteLine($"Failed to create user, {result}");
+            }
+
+        }
 
         public static void SeedDB(ApplicationDbContext context, string adminID)
         {

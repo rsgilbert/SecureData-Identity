@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace ContactManager
 {
@@ -17,11 +18,12 @@ namespace ContactManager
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
+                
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    context.Database.Migrate();
+                    // context.Database.Migrate();
+                    context.Database.EnsureCreated();
                     SeedData.Initialize(services, "not used");
                 }
                 catch (Exception ex)
@@ -30,6 +32,8 @@ namespace ContactManager
                     logger.LogError(ex, "An error occurred seeding the DB.");
                 }
             }
+
+
 
             host.Run();
         }
